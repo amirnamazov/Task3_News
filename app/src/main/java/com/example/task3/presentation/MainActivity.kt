@@ -1,12 +1,12 @@
-package com.example.task3
+package com.example.task3.presentation
 
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.example.task3.databinding.ActivityMainBinding
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
@@ -16,14 +16,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val map = mapOf("q" to "tesla", "from" to "2023-10-12", "sortBy" to "publishedAt")
-
-        runBlocking {
-            val response = async { viewModel.fetchNews(map) }.await()
-            response.collect {
-                println("dlsbfodiodifv   ${it.body()}")
-            }
+        viewModel.responseNews.observe(this) { res ->
+            if (res.isSuccessful && res.body() != null)
+                binding.textView.text = res.body()!!.articles[0].description
+            else
+                binding.textView.text = res.toString()
         }
+
+        val map = mutableMapOf("q" to "tesla", "from" to "2023-10-12", "sortBy" to "publishedAt")
+
+        viewModel.fetchNews(map)
+
 
 //        val handler = CoroutineExceptionHandler { _, throwable ->
 //            println("sdklnsdlkn ${throwable.message}")

@@ -1,4 +1,4 @@
-package com.example.task3
+package com.example.task3.common
 
 object Constants {
     const val base_url = "https://newsapi.org/v2/"

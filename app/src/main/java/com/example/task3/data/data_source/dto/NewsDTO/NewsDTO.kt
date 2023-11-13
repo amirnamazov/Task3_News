@@ -1,6 +1,6 @@
-package com.example.task3.model
+package com.example.task3.data.data_source.dto.NewsDTO
 
-data class News(
+data class NewsDTO(
     val articles: List<Article>,
     val status: String,
     val totalResults: Int
