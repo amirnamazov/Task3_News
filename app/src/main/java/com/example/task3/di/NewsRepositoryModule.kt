@@ -9,8 +9,8 @@ import dagger.hilt.components.SingletonComponent
 
 @Module
 @InstallIn(SingletonComponent :: class)
-abstract class NewsRepositoryModule {
+interface NewsRepositoryModule {
 
     @Binds
-    abstract fun bindsNewsRepository(repository: NewsRepositoryImpl): NewsRepository
+    fun bindsNewsRepository(repository: NewsRepositoryImpl): NewsRepository
 }

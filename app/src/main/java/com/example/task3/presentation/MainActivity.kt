@@ -17,10 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         viewModel.responseNews.observe(this) { res ->
-            if (res.isSuccessful && res.body() != null)
-                binding.textView.text = res.body()!!.articles[0].description
-            else
-                binding.textView.text = res.toString()
+            binding.textView.text = res
         }
 
         val map = mutableMapOf("q" to "tesla", "from" to "2023-10-12", "sortBy" to "publishedAt")
@@ -28,10 +25,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.fetchNews(map)
 
 
-//        val handler = CoroutineExceptionHandler { _, throwable ->
-//            println("sdklnsdlkn ${throwable.message}")
-//        }
-//
 //        lifecycleScope.launch(handler) {
 //            val job = launch {
 //                delay(3000L)
