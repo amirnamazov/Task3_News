@@ -1,7 +1,8 @@
 package com.example.task3.domain.repository
 
 import com.example.task3.data.data_source.dto.NewsDTO.NewsDTO
+import retrofit2.Response
 
 interface NewsRepository {
-    suspend fun getEverything(map: Map<String, String>): NewsDTO
+    suspend fun getEverything(map: Map<String, String>): Response<NewsDTO>
 }

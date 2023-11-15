@@ -16,23 +16,19 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        viewModel.responseNews.observe(this) { res ->
+//        binding.switcher.setOnCheckedChangeListener { buttonView, isChecked ->
+//            runBlocking {
+//                binding.textView.text = Thread.currentThread().name
+//                delay(5000)
+//            }
+//        }
+
+        viewModel.responseNews.observe(this@MainActivity) { res ->
             binding.textView.text = res
         }
 
-        val map = mutableMapOf("q" to "tesla", "from" to "2023-10-12", "sortBy" to "publishedAt")
+        val map = mutableMapOf("q" to "tesla")
 
         viewModel.fetchNews(map)
-
-
-//        lifecycleScope.launch(handler) {
-//            val job = launch {
-//                delay(3000L)
-//                throw Exception("8798798797")
-//            }
-//            delay(500L)
-//            job.cancel()
-//        }
-
     }
 }
