@@ -1,4 +1,4 @@
-package com.example.task3.data.data_source.dto.NewsDTO
+package com.example.task3.data.data_source.remote.dto.NewsDTO
 
 data class Source(
     val id: String,

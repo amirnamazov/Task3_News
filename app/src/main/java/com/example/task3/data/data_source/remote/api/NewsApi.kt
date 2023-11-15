@@ -1,6 +1,6 @@
-package com.example.task3.data.data_source
+package com.example.task3.data.data_source.remote.api
 
-import com.example.task3.data.data_source.dto.NewsDTO.NewsDTO
+import com.example.task3.data.data_source.remote.dto.NewsDTO.NewsDTO
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.QueryMap

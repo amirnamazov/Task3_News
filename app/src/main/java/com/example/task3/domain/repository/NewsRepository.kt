@@ -1,6 +1,6 @@
 package com.example.task3.domain.repository
 
-import com.example.task3.data.data_source.dto.NewsDTO.NewsDTO
+import com.example.task3.data.data_source.remote.dto.NewsDTO.NewsDTO
 import retrofit2.Response
 
 interface NewsRepository {

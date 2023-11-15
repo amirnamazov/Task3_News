@@ -1,6 +1,6 @@
 package com.example.task3.di
 
-import com.example.task3.data.data_source.NewsApi
+import com.example.task3.data.data_source.remote.api.NewsApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
