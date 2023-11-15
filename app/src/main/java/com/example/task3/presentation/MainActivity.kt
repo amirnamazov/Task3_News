@@ -1,34 +1,21 @@
 package com.example.task3.presentation
 
-import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.task3.databinding.ActivityMainBinding
+import com.example.task3.presentation.base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding :: inflate) {
 
-    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    private val viewModel: MainViewModel by viewModels()
+    override fun initialize() {
+        setupBottomNav()
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(binding.root)
-
-//        binding.switcher.setOnCheckedChangeListener { buttonView, isChecked ->
-//            runBlocking {
-//                binding.textView.text = Thread.currentThread().name
-//                delay(5000)
-//            }
-//        }
-
-        viewModel.responseNews.observe(this@MainActivity) { res ->
-            binding.textView.text = res
-        }
-
-        val map = mutableMapOf("q" to "tesla")
-
-        viewModel.fetchNews(map)
+    private fun setupBottomNav() = binding.apply {
+        val navHostFragment = supportFragmentManager.findFragmentById(fragContainer.id)
+                as NavHostFragment
+        bottomNav.setupWithNavController(navHostFragment.navController)
     }
 }
