@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    
+    <data>
+        <variable
+            name="article"
+            type="com.example.task3.data.data_source.remote.dto.news.Article" />
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="280dp"
+        android:layout_height="150dp"
+        android:layout_margin="10dp"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="20dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:foreground="@color/black_half"
+                imageUrl="@{article.urlToImage}"/>
+
+            <TextView
+                android:layout_margin="15dp"
+                android:text="@{article.title}"
+                android:background="@android:color/transparent"
+                android:textSize="18sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/inter_bold"
+                android:maxLines="2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>
