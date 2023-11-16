@@ -1,4 +1,4 @@
-package com.example.task3.presentation.base
+package com.example.task3.presentation.utils
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

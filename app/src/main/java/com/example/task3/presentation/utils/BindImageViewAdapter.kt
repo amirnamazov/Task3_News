@@ -1,4 +1,4 @@
-package com.example.task3.common
+package com.example.task3.presentation.utils
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
@@ -7,9 +7,11 @@ import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
 
 private val shimmer = Shimmer.AlphaHighlightBuilder()
-    .setBaseAlpha(0.7f)
-    .setHighlightAlpha(0.6f)
+    .setBaseAlpha(1f)
+    .setHighlightAlpha(1f)
     .setDirection(Shimmer.Direction.LEFT_TO_RIGHT)
+    .setIntensity(0.3f)
+    .setDropoff(0.7f)
     .setAutoStart(true)
     .build()
 
@@ -18,7 +20,7 @@ private val shimmerDrawable = ShimmerDrawable().apply {
 }
 
 @BindingAdapter("imageUrl")
-fun ImageView.bindUrlImage(imageUrl: String) =
+fun ImageView.bindUrlImage(imageUrl: String?) =
     Glide
         .with(this.context)
         .load(imageUrl)

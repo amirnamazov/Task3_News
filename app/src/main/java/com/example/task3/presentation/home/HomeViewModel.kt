@@ -1,5 +1,7 @@
 package com.example.task3.presentation.home
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.task3.common.ResourceState
@@ -14,19 +16,21 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val useCase: NewsUseCase) : ViewModel() {
 
-    private val _resHeadlines = MutableStateFlow<HomeUIState>(HomeUIState.Empty)
-    val resHeadlines: StateFlow<HomeUIState> get() = _resHeadlines
+    private val _resHeadlines = MutableLiveData<HomeUIState>()
+    val resHeadlines: LiveData<HomeUIState> get() = _resHeadlines
 
     private val _resEverything = MutableStateFlow<HomeUIState>(HomeUIState.Empty)
     val resEverything: StateFlow<HomeUIState> get() = _resEverything
 
-    fun fetchHeadlines(map: Map<String, String>) = viewModelScope.launch(Dispatchers.IO) {
+    fun fetchHeadlines(map: Map<String, String>) = viewModelScope.launch {
         useCase.getHeadlines(map).collect { res ->
             _resHeadlines.value = when(res) {
                 is ResourceState.ConnectionError -> HomeUIState.ConnectionError
                 is ResourceState.Error -> HomeUIState.Error(res.message!!)
                 is ResourceState.Loading -> HomeUIState.Loading
-                is ResourceState.Success -> HomeUIState.Success(res.data!!.articles)
+                is ResourceState.Success ->
+                    if (res.data?.articles.isNullOrEmpty()) HomeUIState.Empty
+                    else HomeUIState.Success(res.data!!.articles)
             }
         }
     }
