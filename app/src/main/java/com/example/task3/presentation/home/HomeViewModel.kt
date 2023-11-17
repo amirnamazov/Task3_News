@@ -5,11 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.task3.common.ResourceState
+import com.example.task3.data.data_source.remote.dto.news.Article
+import com.example.task3.data.data_source.remote.dto.news.NewsDTO
 import com.example.task3.domain.use_cases.NewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,30 +19,31 @@ class HomeViewModel @Inject constructor(private val useCase: NewsUseCase) : View
     private val _resHeadlines = MutableLiveData<HomeUIState>()
     val resHeadlines: LiveData<HomeUIState> get() = _resHeadlines
 
-    private val _resEverything = MutableStateFlow<HomeUIState>(HomeUIState.Empty)
-    val resEverything: StateFlow<HomeUIState> get() = _resEverything
+    private val _resNews = MutableLiveData<HomeUIState>()
+    val resNews: LiveData<HomeUIState> get() = _resNews
 
-    fun fetchHeadlines(map: Map<String, String>) = viewModelScope.launch {
-        useCase.getHeadlines(map).collect { res ->
-            _resHeadlines.value = when(res) {
-                is ResourceState.ConnectionError -> HomeUIState.ConnectionError
-                is ResourceState.Error -> HomeUIState.Error(res.message!!)
-                is ResourceState.Loading -> HomeUIState.Loading
-                is ResourceState.Success ->
-                    if (res.data?.articles.isNullOrEmpty()) HomeUIState.Empty
-                    else HomeUIState.Success(res.data!!.articles)
+    fun fetchHeadlines(map: Map<String, String>) =
+        useCase.getHeadlines(map).fetchData(_resHeadlines)
+
+    fun fetchNews(map: Map<String, String>) =
+        useCase.getEverything(map).fetchData(_resNews)
+
+    private fun Flow<ResourceState<NewsDTO>>.fetchData(livedata: MutableLiveData<HomeUIState>) =
+        viewModelScope.launch {
+            this@fetchData.collect { res ->
+                livedata.value = when (res) {
+                    is ResourceState.ConnectionError -> HomeUIState.ConnectionError
+                    is ResourceState.Error -> HomeUIState.Error(res.message!!)
+                    is ResourceState.Loading -> HomeUIState.Loading
+                    is ResourceState.Success ->
+                        if (res.data?.articles.isNullOrEmpty()) HomeUIState.Empty
+                        else HomeUIState.Success(res.data!!.articles!!.format())
+                }
             }
         }
-    }
 
-    fun fetchEverything(map: Map<String, String>) = viewModelScope.launch(Dispatchers.IO) {
-        useCase.getEverything(map).collect { res ->
-            _resEverything.value = when(res) {
-                is ResourceState.ConnectionError -> HomeUIState.ConnectionError
-                is ResourceState.Error -> HomeUIState.Error(res.message!!)
-                is ResourceState.Loading -> HomeUIState.Loading
-                is ResourceState.Success -> HomeUIState.Success(res.data!!.articles)
-            }
-        }
+    private fun List<Article>.format(): List<Article> = map {
+        val dateFormatted = it.publishedAt?.substring(0, 10)
+        it.copy(publishedAt = dateFormatted)
     }
 }
