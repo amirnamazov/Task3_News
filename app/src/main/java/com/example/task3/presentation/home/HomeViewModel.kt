@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.task3.common.ResourceState
-import com.example.task3.data.data_source.remote.dto.news.Article
 import com.example.task3.data.data_source.remote.dto.news.NewsDTO
+import com.example.task3.domain.model.Article
 import com.example.task3.domain.use_cases.NewsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

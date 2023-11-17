@@ -3,7 +3,7 @@ package com.example.task3.presentation.home
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import com.example.task3.data.data_source.remote.dto.news.Article
+import com.example.task3.domain.model.Article
 import com.example.task3.databinding.FragmentHomeBinding
 import com.example.task3.databinding.ItemHeadlineBinding
 import com.example.task3.databinding.ItemNewsBinding
@@ -25,8 +25,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 //        val mapHeadline = mapOf("country" to "us")
 //        viewModel.fetchHeadlines(mapHeadline)
 //
-//        val mapEverything = mapOf("q" to "tesla")
-//        viewModel.fetchNews(mapEverything)
+//        val mapNews = mapOf("q" to "tesla")
+//        viewModel.fetchNews(mapNews)
     }
 
     private fun observeHeadlines() = viewModel.resHeadlines.observe(viewLifecycleOwner) { state ->

@@ -1,4 +1,6 @@
-package com.example.task3.data.data_source.remote.dto.news
+package com.example.task3.domain.model
+
+import com.example.task3.data.data_source.remote.dto.news.Source
 
 data class Article(
     val author: String?,

@@ -6,7 +6,7 @@
     <data>
         <variable
             name="article"
-            type="com.example.task3.data.data_source.remote.dto.news.Article" />
+            type="com.example.task3.domain.model.Article" />
     </data>
 
     <androidx.cardview.widget.CardView
