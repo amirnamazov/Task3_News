@@ -1,13 +1,16 @@
 package com.example.task3.presentation.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import com.example.task3.domain.model.Article
+import androidx.viewbinding.ViewBinding
 import com.example.task3.databinding.FragmentHomeBinding
 import com.example.task3.databinding.ItemHeadlineBinding
 import com.example.task3.databinding.ItemNewsBinding
+import com.example.task3.domain.model.Article
 import com.example.task3.presentation.base.BaseFragment
+import com.example.task3.presentation.details.DetailsActivity
 import com.example.task3.presentation.utils.CustomAdapter
 import com.facebook.shimmer.ShimmerFrameLayout
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,14 +22,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-//        observeHeadlines()
-//        observeNews()
-//
 //        val mapHeadline = mapOf("country" to "us")
 //        viewModel.fetchHeadlines(mapHeadline)
-//
+//        observeHeadlines()
+
 //        val mapNews = mapOf("q" to "tesla")
 //        viewModel.fetchNews(mapNews)
+//        observeNews()
     }
 
     private fun observeHeadlines() = viewModel.resHeadlines.observe(viewLifecycleOwner) { state ->
@@ -54,6 +56,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         adapter = CustomAdapter(ItemHeadlineBinding::inflate, list?.size ?: 10) { b, i ->
             list?.let {
                 b.article = it[i]
+                b.onItemClickListener(it[i])
             }
         }
     }
@@ -63,8 +66,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         adapter = CustomAdapter(ItemNewsBinding::inflate, list?.size ?: 10) { b, i ->
             list?.let {
                 b.article = it[i]
+                b.onItemClickListener(it[i])
             }
         }
+    }
+
+    private fun ViewBinding.onItemClickListener(article: Article) = root.setOnClickListener {
+        startActivity(
+            Intent(requireContext(), DetailsActivity :: class.java).apply {
+                putExtra("ARTICLE", article)
+            }
+        )
     }
 
     private fun ShimmerFrameLayout.cancelShimmer() {
