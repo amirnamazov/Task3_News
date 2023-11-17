@@ -22,9 +22,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-//        val mapHeadline = mapOf("country" to "us")
-//        viewModel.fetchHeadlines(mapHeadline)
-//        observeHeadlines()
+        val mapHeadline = mapOf("country" to "us")
+        viewModel.fetchHeadlines(mapHeadline)
+        observeHeadlines()
 
 //        val mapNews = mapOf("q" to "tesla")
 //        viewModel.fetchNews(mapNews)
