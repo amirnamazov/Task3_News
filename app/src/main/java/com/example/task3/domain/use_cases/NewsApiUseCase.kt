@@ -7,7 +7,7 @@ import com.example.task3.domain.repository.NewsRemoteRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class NewsUseCase @Inject constructor(private val repository: NewsRemoteRepository) {
+class NewsApiUseCase @Inject constructor(private val repository: NewsRemoteRepository) {
 
     fun getEverything(map: Map<String, String>): Flow<ResourceState<NewsDTO>> = flowResponse {
         repository.getEverything(map)

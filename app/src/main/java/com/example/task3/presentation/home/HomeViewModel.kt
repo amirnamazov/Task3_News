@@ -7,14 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.task3.common.ResourceState
 import com.example.task3.data.data_source.remote.dto.news.NewsDTO
 import com.example.task3.domain.model.Article
-import com.example.task3.domain.use_cases.NewsUseCase
+import com.example.task3.domain.use_cases.NewsApiUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val useCase: NewsUseCase) : ViewModel() {
+class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : ViewModel() {
 
     private val _resHeadlines = MutableLiveData<HomeUIState>()
     val resHeadlines: LiveData<HomeUIState> get() = _resHeadlines
