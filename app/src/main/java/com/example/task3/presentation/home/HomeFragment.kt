@@ -23,48 +23,45 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val mapHeadline = mapOf("country" to "us")
-        viewModel.fetchHeadlines(mapHeadline)
-        observeHeadlines()
+//        val mapHeadline = mapOf("country" to "us")
+//        viewModel.fetchHeadlines(mapHeadline)
+//        observeHeadlines()
 
-//        val mapNews = mapOf("q" to "tesla")
-//        viewModel.fetchNews(mapNews)
-//        observeNews()
+        val mapNews = mapOf("q" to "tesla")
+        viewModel.fetchNews(mapNews)
+        observeNews()
     }
 
     private fun observeHeadlines() = viewModel.resHeadlines.observe(viewLifecycleOwner) { state ->
         when (state) {
-            is HomeUIState.ConnectionError -> {}
-            is HomeUIState.Error -> {}
-            is HomeUIState.Loading -> setupRvHeadlines()
+            is HomeUIState.Loading -> setupRvHeadlines(count = 10)
             is HomeUIState.Success -> setupRvHeadlines(state.data)
-            is HomeUIState.Empty -> {}
+            else -> setupRvHeadlines()
         }
     }
 
     private fun observeNews() = viewModel.resNews.observe(viewLifecycleOwner) { state ->
         when (state) {
-            is HomeUIState.ConnectionError -> {}
-            is HomeUIState.Error -> {}
-            is HomeUIState.Loading -> setupRvNews()
+            is HomeUIState.Loading -> setupRvNews(count = 10)
             is HomeUIState.Success -> setupRvNews(state.data)
-            is HomeUIState.Empty -> {}
+            else -> setupRvNews()
         }
     }
 
-    private fun setupRvHeadlines(list: List<Article>? = null) = binding.rvHeadlines.apply {
-        list?.let { binding.slHeadlines.cancelShimmer() }
-        adapter = CustomAdapter(ItemHeadlineBinding::inflate, list?.size ?: 10) { b, i ->
-            list?.let {
-                b.article = it[i]
-                b.onItemClickListener(it[i])
+    private fun setupRvHeadlines(list: List<Article>? = null, count: Int = 0) =
+        binding.rvHeadlines.apply {
+            list?.let { binding.slHeadlines.cancelShimmer() }
+            adapter = CustomAdapter(ItemHeadlineBinding::inflate, list?.size ?: count) { b, i ->
+                list?.let {
+                    b.article = it[i]
+                    b.onItemClickListener(it[i])
+                }
             }
         }
-    }
 
-    private fun setupRvNews(list: List<Article>? = null) = binding.rvNews.apply {
+    private fun setupRvNews(list: List<Article>? = null, count: Int = 0) = binding.rvNews.apply {
         list?.let { binding.slNews.cancelShimmer() }
-        adapter = CustomAdapter(ItemNewsBinding::inflate, list?.size ?: 10) { b, i ->
+        adapter = CustomAdapter(ItemNewsBinding::inflate, list?.size ?: count) { b, i ->
             list?.let {
                 b.article = it[i]
                 b.onItemClickListener(it[i])

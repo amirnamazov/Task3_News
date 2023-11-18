@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.task3.common.ResourceState
 import com.example.task3.data.data_source.local.model.ArticleModel
-import com.example.task3.domain.model.Article
 import com.example.task3.domain.use_cases.NewsLocalUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -19,10 +18,7 @@ class DetailsViewModel @Inject constructor(private val useCase: NewsLocalUseCase
     private val _articleSave = MutableLiveData<DetailsState>()
     val articleSave: LiveData<DetailsState> get() = _articleSave
 
-    fun saveArticle(article: Article) {
-        val model = ArticleModel(article)
-        useCase.insert(model).getResponse(_articleSave)
-    }
+    fun saveArticle(model: ArticleModel) = useCase.insert(model).getResponse(_articleSave)
 
     private val _articleRemove = MutableLiveData<DetailsState>()
     val articleRemove: LiveData<DetailsState> get() = _articleRemove

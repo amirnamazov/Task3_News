@@ -1,6 +1,6 @@
 package com.example.task3.presentation.details
 
-import android.graphics.drawable.Drawable
+import android.app.Activity
 import android.os.Build
 import android.view.Menu
 import android.view.MenuItem
@@ -28,14 +28,6 @@ class DetailsActivity : BaseActivity<ActivityDetailsBinding>(ActivityDetailsBind
         }
     }
 
-//    private val articleId: Int by lazy {
-//        try {
-//            intent.getIntExtra("ARTICLE_ID", -1)
-//        } catch (e: Exception) {
-//            -1
-//        }
-//    }
-
     private var saved by Delegates.notNull<Boolean>()
 
     override fun initialize() {
@@ -60,24 +52,19 @@ class DetailsActivity : BaseActivity<ActivityDetailsBinding>(ActivityDetailsBind
 
     private fun LiveData<DetailsState>.observe(save: Boolean, onSuccess: () -> Unit) =
         observe(this@DetailsActivity) { state ->
+            if (!save) setResult(Activity.RESULT_OK)
+            else setResult(Activity.RESULT_CANCELED)
             when (state) {
-                is DetailsState.Error -> println("iudfgifdugdfiug errrror  ${state.message}")
-                is DetailsState.Success -> {
-                    println("iudfgifdugdfiug $save  ${state.message}")
-                    saved = save; onSuccess()
-                }
+                is DetailsState.Error -> {}
+                is DetailsState.Success -> { saved = save; onSuccess() }
             }
         }
-
-    private fun getSaveIcon(): Drawable? =
-        if (saved) ContextCompat.getDrawable(this, R.drawable.ic_saved)
-        else ContextCompat.getDrawable(this, R.drawable.ic_save)
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_save -> articleModel?.let {
                 if (saved) viewModel.removeArticle(it.id)
-                else viewModel.saveArticle(it.article)
+                else viewModel.saveArticle(it)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -86,9 +73,12 @@ class DetailsActivity : BaseActivity<ActivityDetailsBinding>(ActivityDetailsBind
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
         val item = menu!!.findItem(R.id.menu_save)
-        item.icon = getSaveIcon()
-        viewModel.articleSave.observe(true) { item.icon = getSaveIcon() }
-        viewModel.articleRemove.observe(false) { item.icon = getSaveIcon() }
+        val savedIcon = ContextCompat.getDrawable(this, R.drawable.ic_saved)
+        val saveIcon = ContextCompat.getDrawable(this, R.drawable.ic_save)
+        if (saved) item.icon = savedIcon
+
+        viewModel.articleSave.observe(true) { item.icon = savedIcon }
+        viewModel.articleRemove.observe(false) { item.icon = saveIcon }
         return super.onCreateOptionsMenu(menu)
     }
 
