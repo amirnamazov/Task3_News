@@ -17,4 +17,7 @@ interface ArticleDao {
 
     @Delete
     suspend fun delete(article: ArticleModel)
+
+    @Query("DELETE FROM articles_db WHERE id = (SELECT MAX(id) FROM articles_db)")
+    suspend fun deleteLast()
 }

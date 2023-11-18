@@ -74,6 +74,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun ViewBinding.onItemClickListener(article: Article) = root.setOnClickListener {
         startActivity(
             Intent(requireContext(), DetailsActivity :: class.java).apply {
+                putExtra("ARTICLE_SAVED", false)
                 putExtra("ARTICLE", article)
             }
         )

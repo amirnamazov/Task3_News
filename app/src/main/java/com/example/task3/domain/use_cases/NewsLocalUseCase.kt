@@ -16,4 +16,6 @@ class NewsLocalUseCase @Inject constructor(private val repository: NewsLocalRepo
     fun delete(articleModel: ArticleModel) = flowResponse {
         repository.deleteArticle(articleModel)
     }
+
+    fun deleteLast() = flowResponse { repository.deleteLastArticle() }
 }

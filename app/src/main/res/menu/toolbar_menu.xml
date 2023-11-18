@@ -8,7 +8,7 @@
         <menu>
             <item
                 android:id="@+id/menu_save"
-                android:icon="@drawable/ic_saved"
+                android:icon="@drawable/ic_save"
                 android:title="Save"/>
             <item
                 android:id="@+id/menu_share"

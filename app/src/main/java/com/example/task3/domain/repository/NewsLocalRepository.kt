@@ -9,4 +9,6 @@ interface NewsLocalRepository {
     suspend fun insertArticle(articleModel: ArticleModel)
 
     suspend fun deleteArticle(articleModel: ArticleModel)
+
+    suspend fun deleteLastArticle()
 }

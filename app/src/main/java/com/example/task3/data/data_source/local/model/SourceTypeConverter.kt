@@ -2,14 +2,13 @@ package com.example.task3.data.data_source.local.model
 
 import androidx.room.TypeConverter
 import com.example.task3.data.data_source.remote.dto.news.Source
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.google.gson.Gson
 
 class SourceTypeConverter {
 
     @TypeConverter
-    fun toSource(string: String?): Source = Json.decodeFromString(string!!)
+    fun toSource(json: String?): Source = Gson().fromJson(json, Source::class.java)
 
     @TypeConverter
-    fun toString(source: Source?): String = Json.encodeToString(source!!)
+    fun toString(source: Source?): String = Gson().toJson(source)
 }

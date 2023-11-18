@@ -1,11 +1,12 @@
 package com.example.task3.presentation.details
 
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
 import com.bumptech.glide.Glide
 import com.example.task3.R
 import com.example.task3.databinding.ActivityDetailsBinding
@@ -20,72 +21,81 @@ class DetailsActivity : BaseActivity<ActivityDetailsBinding>(ActivityDetailsBind
 
     private val article by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("ARTICLE", Article :: class.java)
+            intent.getParcelableExtra("ARTICLE", Article::class.java)
         } else {
-            intent.getParcelableExtra("ARTICLE",)
+            intent.getParcelableExtra("ARTICLE")
         }
     }
 
+    private var saved: Boolean = false
+
     override fun initialize() {
+        setupActionBar()
+
+        saved = intent.getBooleanExtra("ARTICLE_SAVED", false)
+
+        initViews()
+        observeArticleList()
+    }
+
+    private fun setupActionBar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         title = null
+    }
 
-        article?.let {
-            binding.article = it
-            it.urlToImage?.let { url ->
-                binding.image.setImage(url)
+    private fun initViews() = article?.let {
+        binding.article = it
+        it.urlToImage?.let { url ->
+            Glide.with(this@DetailsActivity).load(url).into(binding.image)
+        }
+    }
+
+    private fun observeArticleList() = viewModel.articleList.observe(this) { state ->
+        when (state) {
+            is DetailsState.Error -> println("iudfgifdugdfiug errrror  ${state.message}")
+            is DetailsState.Success -> println("iudfgifdugdfiug  ${state.message}   ${state.data!!.map { it.article.author }}")
+        }
+    }
+
+    private fun LiveData<DetailsState>.observe(save: Boolean, onSuccess: () -> Unit) =
+        observe(this@DetailsActivity) { state ->
+            when (state) {
+                is DetailsState.Error -> println("iudfgifdugdfiug errrror  ${state.message}")
+                is DetailsState.Success -> {
+                    println("iudfgifdugdfiug $save  ${state.message}")
+                    saved = save; onSuccess()
+                }
             }
         }
 
-        observeSaveData()
-    }
-
-    private fun observeSaveData() = viewModel.articleSave.observe(this) { state ->
-        when (state) {
-            is DetailsState.Error -> println("uvycutxutx errrror  ${state.message}")
-            is DetailsState.Loading -> println("uvycutxutx  loading")
-            is DetailsState.Success -> println("uvycutxutx  ${state.message}")
-        }
-    }
-
-
-//    private fun collectSaveData() = lifecycleScope.launch {
-//        viewModel.articleSave.collect { state ->
-//            when (state) {
-//                is DetailsState.Error -> Toast.makeText(this@DetailsActivity, state.message, Toast.LENGTH_SHORT).show()
-//                is DetailsState.Loading -> Toast.makeText(this@DetailsActivity, "loading", Toast.LENGTH_SHORT).show()
-//                is DetailsState.Success -> Toast.makeText(this@DetailsActivity, state.message, Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
-
-    private fun AppCompatImageView.setImage(imageUrl: String) = Glide
-        .with(this@DetailsActivity)
-        .load(imageUrl)
-        .into(this)
-
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressedDispatcher.onBackPressed()
-        return true
-    }
+    private fun getSaveIcon(): Drawable? =
+        if (saved) ContextCompat.getDrawable(this, R.drawable.ic_saved)
+        else ContextCompat.getDrawable(this, R.drawable.ic_save)
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
-            R.id.menu_save -> {
-                article?.let { viewModel.saveArticle(it) }
-                true
+        when (item.itemId) {
+            R.id.menu_save -> article?.let {
+                if (saved) viewModel.removeLastArticle()
+                else viewModel.saveArticle(it)
             }
-            R.id.menu_share -> {
-                Toast.makeText(this, "dslbdfkjf", Toast.LENGTH_SHORT).show()
-                true
-            }
-            else -> false
+
+            R.id.menu_share -> viewModel.getArticleList()
         }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.toolbar_menu, menu)
+        val item = menu!!.findItem(R.id.menu_save)
+        item.icon = getSaveIcon()
+        viewModel.articleSave.observe(true) { item.icon = getSaveIcon() }
+        viewModel.articleRemove.observe(false) { item.icon = getSaveIcon() }
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressedDispatcher.onBackPressed()
+        return true
     }
 }

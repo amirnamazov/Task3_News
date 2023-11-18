@@ -19,11 +19,11 @@ class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : V
     private val _resHeadlines = MutableLiveData<HomeUIState>()
     val resHeadlines: LiveData<HomeUIState> get() = _resHeadlines
 
-    private val _resNews = MutableLiveData<HomeUIState>()
-    val resNews: LiveData<HomeUIState> get() = _resNews
-
     fun fetchHeadlines(map: Map<String, String>) =
         useCase.getHeadlines(map).fetchData(_resHeadlines)
+
+    private val _resNews = MutableLiveData<HomeUIState>()
+    val resNews: LiveData<HomeUIState> get() = _resNews
 
     fun fetchNews(map: Map<String, String>) =
         useCase.getEverything(map).fetchData(_resNews)

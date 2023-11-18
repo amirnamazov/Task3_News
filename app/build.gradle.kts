@@ -72,6 +72,4 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
 }
