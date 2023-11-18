@@ -11,7 +11,7 @@ class NewsLocalRepositoryImpl @Inject constructor(private val dao: ArticleDao) :
 
     override suspend fun insertArticle(articleModel: ArticleModel) = dao.insert(articleModel)
 
-    override suspend fun deleteArticle(articleModel: ArticleModel) = dao.delete(articleModel)
+    override suspend fun deleteArticle(id: Int) = dao.deleteById(id)
 
     override suspend fun deleteLastArticle() = dao.deleteLast()
 }

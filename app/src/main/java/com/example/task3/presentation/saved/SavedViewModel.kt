@@ -1,35 +1,31 @@
 package com.example.task3.presentation.saved
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.task3.common.ResourceState
 import com.example.task3.domain.use_cases.NewsLocalUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SavedViewModel @Inject constructor(private val useCase: NewsLocalUseCase) : ViewModel() {
 
-//    private val _resNews = MutableLiveData<HomeUIState>()
-//    val resNews: LiveData<HomeUIState> get() = _resNews
-//
-//    fun fetchNews(map: Map<String, String>) =
-//        useCase.getEverything(map).fetchData(_resNews)
-//
-//    private fun Flow<ResourceState<NewsDTO>>.fetchData(livedata: MutableLiveData<HomeUIState>) =
-//        viewModelScope.launch {
-//            this@fetchData.collect { res ->
-//                livedata.value = when (res) {
-//                    is ResourceState.ConnectionError -> HomeUIState.ConnectionError
-//                    is ResourceState.Error -> HomeUIState.Error(res.message!!)
-//                    is ResourceState.Loading -> HomeUIState.Loading
-//                    is ResourceState.Success ->
-//                        if (res.data?.articles.isNullOrEmpty()) HomeUIState.Empty
-//                        else HomeUIState.Success(res.data!!.articles!!.format())
-//                }
-//            }
-//        }
-//
-//    private fun List<Article>.format(): List<Article> = map {
-//        val dateFormatted = it.publishedAt?.substring(0, 10)
-//        it.copy(publishedAt = dateFormatted)
-//    }
+    private val _articleList = MutableLiveData<SavedUIState>()
+    val articleList: LiveData<SavedUIState> get() = _articleList
+
+    fun getArticleList() = viewModelScope.launch {
+        useCase.getAll().collect { res ->
+            _articleList.value = when (res) {
+                is ResourceState.ConnectionError -> SavedUIState.Error(res.message!!)
+                is ResourceState.Error -> SavedUIState.Error(res.message!!)
+                is ResourceState.Loading -> SavedUIState.Loading
+                is ResourceState.Success ->
+                    if (res.data.isNullOrEmpty()) SavedUIState.Empty
+                    else SavedUIState.Success(res.data)
+            }
+        }
+    }
 }

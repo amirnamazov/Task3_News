@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.viewbinding.ViewBinding
+import com.example.task3.data.data_source.local.model.ArticleModel
 import com.example.task3.databinding.FragmentHomeBinding
 import com.example.task3.databinding.ItemHeadlineBinding
 import com.example.task3.databinding.ItemNewsBinding
@@ -74,8 +75,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private fun ViewBinding.onItemClickListener(article: Article) = root.setOnClickListener {
         startActivity(
             Intent(requireContext(), DetailsActivity :: class.java).apply {
-                putExtra("ARTICLE_SAVED", false)
-                putExtra("ARTICLE", article)
+                putExtra("ARTICLE_MODEL", ArticleModel(article))
             }
         )
     }

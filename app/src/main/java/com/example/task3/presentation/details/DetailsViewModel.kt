@@ -16,25 +16,6 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(private val useCase: NewsLocalUseCase) : ViewModel() {
 
-
-    private val _articleList = MutableLiveData<DetailsState>()
-    val articleList: LiveData<DetailsState> get() = _articleList
-
-    fun getArticleList() = viewModelScope.launch {
-        useCase.getAll().collect { res ->
-            _articleList.value = when (res) {
-                is ResourceState.ConnectionError -> DetailsState.Error(res.message!!)
-                is ResourceState.Error -> DetailsState.Error(res.message!!)
-                is ResourceState.Loading -> null
-                is ResourceState.Success -> DetailsState.Success(res.data)
-            }
-        }
-    }
-
-
-
-
-
     private val _articleSave = MutableLiveData<DetailsState>()
     val articleSave: LiveData<DetailsState> get() = _articleSave
 
@@ -46,7 +27,9 @@ class DetailsViewModel @Inject constructor(private val useCase: NewsLocalUseCase
     private val _articleRemove = MutableLiveData<DetailsState>()
     val articleRemove: LiveData<DetailsState> get() = _articleRemove
 
-    fun removeLastArticle() = useCase.deleteLast().getResponse(_articleRemove)
+    fun removeArticle(id: Int) =
+        if (id != 0) useCase.delete(id).getResponse(_articleRemove)
+        else useCase.deleteLast().getResponse(_articleRemove)
 
     private fun Flow<ResourceState<Unit>>.getResponse(liveData: MutableLiveData<DetailsState>) =
         viewModelScope.launch {
