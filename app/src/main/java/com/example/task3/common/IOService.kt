@@ -6,14 +6,25 @@ import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 import java.net.ConnectException
 
-object ResponseService {
+object IOService {
 
-    fun <T> flowResponse(delay: Long = 0, request: suspend () -> Response<T>):
-            Flow<ResourceState<T>> = flow {
+    fun <T> flowData(request: suspend () -> T): Flow<ResourceState<T>> = flow {
+        try {
+            emit(ResourceState.Loading())
+            delay(200)
+            val response = request.invoke()
+            emit(ResourceState.Success(response))
+        } catch (e: ConnectException) {
+            emit(ResourceState.ConnectionError(message = "Connection Problem."))
+        } catch (e: Exception) {
+            emit(ResourceState.Error(message = e.message ?: "Something went wrong."))
+        }
+    }
+
+    fun <T> flowResponse(request: suspend () -> Response<T>): Flow<ResourceState<T>> = flow {
         try {
             emit(ResourceState.Loading())
             val response = request.invoke()
-            delay(delay)
             if (response.isSuccessful && response.body() != null) {
                 emit(ResourceState.Success(response.body()!!))
             } else {

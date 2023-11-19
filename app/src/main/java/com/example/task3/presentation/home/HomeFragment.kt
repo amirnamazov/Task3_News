@@ -14,6 +14,7 @@ import com.example.task3.domain.model.Article
 import com.example.task3.presentation.base.BaseFragment
 import com.example.task3.presentation.details.DetailsActivity
 import com.example.task3.presentation.utils.CustomAdapter
+import com.facebook.shimmer.ShimmerFrameLayout
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -22,16 +23,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     private val viewModel: HomeViewModel by viewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        binding.etSearch.doAfterTextChanged { text ->
-            if (!text.isNullOrEmpty()) viewModel.fetchNews(text.toString())
-        }
+        searchText()
 
 //        viewModel.fetchHeadlines()
 //        observeHeadlines()
 
-//        viewModel.fetchNews()
-//        observeNews()
+        viewModel.fetchNews()
+        observeNews()
+    }
+
+    private fun searchText() = binding.etSearch.doAfterTextChanged { text ->
+        if (!text.isNullOrEmpty()) {
+            setupRvNews()
+            viewModel.searchNews(text.toString())
+            binding.slNews.start()
+        }
     }
 
     private fun observeHeadlines() = viewModel.resHeadlines.observe(viewLifecycleOwner) { state ->
@@ -51,7 +57,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupRvHeadlines(list: List<Article>? = null, count: Int = 0) {
-        list?.let { binding.slHeadlines.hideShimmer() }
+        list?.let { binding.slHeadlines.stop() }
         binding.rvHeadlines.adapter =
             CustomAdapter(ItemHeadlineBinding::inflate, list?.size ?: count) { b, i ->
                 list?.let {
@@ -62,7 +68,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupRvNews(list: List<Article>? = null, count: Int = 0) = binding.rvNews.apply {
-        list?.let { binding.slNews.hideShimmer() }
+        list?.let { binding.slNews.stop() }
         adapter = CustomAdapter(ItemNewsBinding::inflate, list?.size ?: count) { b, i ->
             list?.let {
                 b.article = it[i]
@@ -77,5 +83,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
                 putExtra("ARTICLE_MODEL", ArticleModel(article))
             }
         )
+    }
+
+    private fun ShimmerFrameLayout.stop() {
+        stopShimmer()
+        hideShimmer()
+    }
+
+    private fun ShimmerFrameLayout.start() {
+        startShimmer()
+        showShimmer(true)
     }
 }
