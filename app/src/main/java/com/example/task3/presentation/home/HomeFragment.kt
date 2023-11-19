@@ -24,12 +24,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         searchText()
+        setupLanguageButton()
 
-//        viewModel.fetchHeadlines()
-//        observeHeadlines()
+        viewModel.fetchHeadlines()
+        observeHeadlines()
 
         viewModel.fetchNews()
         observeNews()
+    }
+
+    private fun setupLanguageButton() = binding.btnLang.apply {
+        text = viewModel.sharedPref.getString("LANGUAGE", "en")?.uppercase()
+        val dialogLang = BottomSheetDialogLang(requireContext(), viewModel.sharedPref) {
+            viewModel.fetchHeadlines()
+            viewModel.fetchNews()
+            text = it
+        }
+        setOnClickListener { dialogLang.show() }
     }
 
     private fun searchText() = binding.etSearch.doAfterTextChanged { text ->

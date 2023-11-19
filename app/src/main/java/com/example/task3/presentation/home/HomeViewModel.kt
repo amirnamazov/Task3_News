@@ -1,5 +1,6 @@
 package com.example.task3.presentation.home
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -22,28 +23,40 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : ViewModel() {
 
+    @Inject
+    lateinit var sharedPref: SharedPreferences
+
+    private fun mapHeadLine(): Map<String, String> = mapOf(
+        "language" to sharedPref.getString("LANGUAGE", "en")!!
+    )
+
+    private fun mapEveryThing(query: String): Map<String, String> = mapOf(
+        "q" to query,
+        "language" to sharedPref.getString("LANGUAGE", "en")!!
+    )
+
     private val _resHeadlines = MutableLiveData<HomeUIState>()
     val resHeadlines: LiveData<HomeUIState> get() = _resHeadlines
 
     fun fetchHeadlines() =
-        useCase.getHeadlines(mapOf("country" to "us")).fetchData(_resHeadlines)
+        useCase.getHeadlines(mapHeadLine()).fetchData(_resHeadlines)
 
     private val _resNews = MutableLiveData<HomeUIState>()
     val resNews: LiveData<HomeUIState> get() = _resNews
 
     fun fetchNews(query: String = "tesla") =
-        useCase.getEverything(mapOf("q" to query)).fetchData(_resNews)
+        useCase.getEverything(mapEveryThing(query)).fetchData(_resNews)
 
-    private val sharedFlow = MutableSharedFlow<String>(
+    private val sharedFlowSearch = MutableSharedFlow<String>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    fun searchNews(query: String) = sharedFlow.tryEmit(query)
+    fun searchNews(query: String) = sharedFlowSearch.tryEmit(query)
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            sharedFlow.debounce(300).collect { fetchNews(it) }
+            sharedFlowSearch.debounce(300).collect { fetchNews(it) }
         }
     }
     

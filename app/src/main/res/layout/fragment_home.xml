@@ -39,6 +39,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_lang"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
+            app:backgroundTint="#D7D7D7"
+            app:iconPadding="20dp"
+            app:iconGravity="end"
+            app:icon="@drawable/ic_lang"
+            app:iconTint="@null" />
+
         <com.facebook.shimmer.ShimmerFrameLayout
             android:id="@+id/sl_news"
             android:layout_width="match_parent"
