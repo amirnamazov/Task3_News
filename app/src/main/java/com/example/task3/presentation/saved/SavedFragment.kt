@@ -13,7 +13,6 @@ import com.example.task3.databinding.ItemNewsBinding
 import com.example.task3.presentation.base.BaseFragment
 import com.example.task3.presentation.details.DetailsActivity
 import com.example.task3.presentation.utils.CustomAdapter
-import com.facebook.shimmer.ShimmerFrameLayout
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,16 +33,16 @@ class SavedFragment : BaseFragment<FragmentSavedBinding>(FragmentSavedBinding ::
         }
     }
 
-    private fun setupRvNews(list: List<ArticleModel>? = null, count: Int = 0) =
-        binding.rvSavedNews.apply {
-            list?.let { binding.slSavedNews.cancelShimmer() }
-            adapter = CustomAdapter(ItemNewsBinding::inflate, list?.size ?: count) { b, i ->
+    private fun setupRvNews(list: List<ArticleModel>? = null, count: Int = 0) {
+        list?.let { binding.slSavedNews.hideShimmer() }
+        binding.rvSavedNews.adapter =
+            CustomAdapter(ItemNewsBinding::inflate, list?.size ?: count) { b, i ->
                 list?.let {
                     b.article = it[i].article
                     b.onItemClickListener(it[i])
                 }
             }
-        }
+    }
 
     private fun ViewBinding.onItemClickListener(model: ArticleModel) = root.setOnClickListener {
         val intent = Intent(requireContext(), DetailsActivity :: class.java).apply {
@@ -55,12 +54,5 @@ class SavedFragment : BaseFragment<FragmentSavedBinding>(FragmentSavedBinding ::
     private val resultLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) viewModel.getArticleList()
-    }
-
-    private fun ShimmerFrameLayout.cancelShimmer() {
-        if (isShimmerStarted) {
-            stopShimmer()
-            hideShimmer()
-        }
     }
 }

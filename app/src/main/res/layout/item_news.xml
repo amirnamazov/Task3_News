@@ -16,7 +16,7 @@
 
         <TextView
             android:id="@+id/tv_title"
-            android:background="@{article.title == null ? @color/black_half : @android:color/transparent}"
+            android:background="@{article == null ? @color/black_half : @android:color/transparent}"
             android:text="@{article.title}"
             android:textSize="18sp"
             android:fontFamily="@font/inter_bold"
@@ -29,7 +29,7 @@
 
         <TextView
             android:id="@+id/tv_date"
-            android:background="@{article.title == null ? @color/black_half : @android:color/transparent}"
+            android:background="@{article == null ? @color/black_half : @android:color/transparent}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -42,7 +42,7 @@
 
         <TextView
             android:id="@+id/tv_author"
-            android:background="@{article.title == null ? @color/black_half : @android:color/transparent}"
+            android:background="@{article == null ? @color/black_half : @android:color/transparent}"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="end"
