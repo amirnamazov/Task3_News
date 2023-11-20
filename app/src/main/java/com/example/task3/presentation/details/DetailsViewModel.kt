@@ -8,8 +8,10 @@ import com.example.task3.common.ResourceState
 import com.example.task3.data.data_source.local.model.ArticleModel
 import com.example.task3.domain.use_cases.NewsLocalUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,7 +20,15 @@ class DetailsViewModel @Inject constructor(private val useCase: NewsLocalUseCase
     private val _articleSave = MutableLiveData<DetailsState>()
     val articleSave: LiveData<DetailsState> get() = _articleSave
 
-    fun saveArticle(model: ArticleModel) = useCase.insert(model).getResponse(_articleSave)
+    fun saveArticle(model: ArticleModel) = viewModelScope.launch(Dispatchers.IO) {
+        useCase.getAll().collect { res ->
+            if (res is ResourceState.Success) {
+                val articles = res.data!!.map { it.article }
+                if (!articles.contains(model.article))
+                    useCase.insert(model).getResponse(_articleSave)
+            }
+        }
+    }
 
     private val _articleRemove = MutableLiveData<DetailsState>()
     val articleRemove: LiveData<DetailsState> get() = _articleRemove
@@ -28,13 +38,15 @@ class DetailsViewModel @Inject constructor(private val useCase: NewsLocalUseCase
         else useCase.deleteLast().getResponse(_articleRemove)
 
     private fun Flow<ResourceState<Unit>>.getResponse(liveData: MutableLiveData<DetailsState>) =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             this@getResponse.collect { res ->
-                liveData.value = when (res) {
-                    is ResourceState.ConnectionError -> DetailsState.Error(res.message!!)
-                    is ResourceState.Error -> DetailsState.Error(res.message!!)
-                    is ResourceState.Loading -> null
-                    is ResourceState.Success -> DetailsState.Success()
+                withContext(Dispatchers.Main) {
+                    liveData.value = when (res) {
+                        is ResourceState.ConnectionError -> DetailsState.Error(res.message!!)
+                        is ResourceState.Error -> DetailsState.Error(res.message!!)
+                        is ResourceState.Loading -> null
+                        is ResourceState.Success -> DetailsState.Success()
+                    }
                 }
             }
         }

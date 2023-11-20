@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
@@ -61,15 +62,17 @@ class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : V
     }
     
     private fun Flow<ResourceState<NewsDTO>>.fetchData(livedata: MutableLiveData<HomeUIState>) =
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             this@fetchData.collect { res ->
-                    livedata.value = when (res) {
-                        is ResourceState.ConnectionError -> HomeUIState.ConnectionError
-                        is ResourceState.Error -> HomeUIState.Error(res.message!!)
-                        is ResourceState.Loading -> HomeUIState.Loading
-                        is ResourceState.Success ->
-                            if (res.data?.articles.isNullOrEmpty()) HomeUIState.Empty
-                            else HomeUIState.Success(res.data!!.articles!!.format())
+                    withContext(Dispatchers.Main) {
+                        livedata.value = when (res) {
+                            is ResourceState.ConnectionError -> HomeUIState.ConnectionError
+                            is ResourceState.Error -> HomeUIState.Error(res.message!!)
+                            is ResourceState.Loading -> HomeUIState.Loading
+                            is ResourceState.Success ->
+                                if (res.data?.articles.isNullOrEmpty()) HomeUIState.Empty
+                                else HomeUIState.Success(res.data!!.articles!!.format())
+                        }
                     }
                 }
         }
