@@ -16,9 +16,10 @@ class BottomSheetDialogLang(
     init {
         val list = Languages.values()
         val binding = BottomSheetLangBinding.inflate(layoutInflater)
+
         binding.root.apply {
-            adapter = ArrayAdapter(context,
-                android.R.layout.simple_list_item_1, list)
+            adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, list)
+
             setOnItemClickListener { _, _, position, _ ->
                 sharedPref.edit().putString("LANGUAGE", list[position].field).apply()
                 onItemClickListener(list[position].name)

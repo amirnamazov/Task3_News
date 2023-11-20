@@ -2,9 +2,13 @@ package com.example.task3.presentation.home
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.example.task3.data.data_source.local.model.ArticleModel
 import com.example.task3.databinding.FragmentHomeBinding
@@ -16,21 +20,30 @@ import com.example.task3.presentation.details.DetailsActivity
 import com.example.task3.presentation.utils.CustomAdapter
 import com.facebook.shimmer.ShimmerFrameLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.properties.Delegates
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
 
     private val viewModel: HomeViewModel by viewModels()
 
+    private var searchText by Delegates.observable("") { _, old, new ->
+        if (new != old && new.isNotEmpty()) viewModel.searchNews(new)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        searchText()
+        binding.etSearch.doAfterTextChanged { searchText = it.toString() }
         setupLanguageButton()
 
         viewModel.fetchHeadlines()
-        observeHeadlines()
+        viewModel.resHeadlines.observe(binding.slHeadlines) { list, count ->
+            binding.rvHeadlines.setAdapter(ItemHeadlineBinding::inflate, list, count)
+        }
 
         viewModel.fetchNews()
-        observeNews()
+        viewModel.resNews.observe(binding.slNews) { list, count ->
+            binding.rvNews.setAdapter(ItemNewsBinding::inflate, list, count)
+        }
     }
 
     private fun setupLanguageButton() = binding.btnLang.apply {
@@ -43,47 +56,29 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
         setOnClickListener { dialogLang.show() }
     }
 
-    private fun searchText() = binding.etSearch.doAfterTextChanged { text ->
-        if (!text.isNullOrEmpty()) {
-            setupRvNews()
-            viewModel.searchNews(text.toString())
-            binding.slNews.start()
-        }
-    }
-
-    private fun observeHeadlines() = viewModel.resHeadlines.observe(viewLifecycleOwner) { state ->
-        when (state) {
-            is HomeUIState.Loading -> setupRvHeadlines(count = 10)
-            is HomeUIState.Success -> setupRvHeadlines(state.data)
-            else -> setupRvHeadlines()
-        }
-    }
-
-    private fun observeNews() = viewModel.resNews.observe(viewLifecycleOwner) { state ->
-        when (state) {
-            is HomeUIState.Loading -> setupRvNews(count = 10)
-            is HomeUIState.Success -> setupRvNews(state.data)
-            else -> setupRvNews()
-        }
-    }
-
-    private fun setupRvHeadlines(list: List<Article>? = null, count: Int = 0) {
-        list?.let { binding.slHeadlines.stop() }
-        binding.rvHeadlines.adapter =
-            CustomAdapter(ItemHeadlineBinding::inflate, list?.size ?: count) { b, i ->
-                list?.let {
-                    b.article = it[i]
-                    b.onItemClickListener(it[i])
-                }
+    private fun LiveData<HomeUIState>
+            .observe(sfl: ShimmerFrameLayout, setAdapter: (List<Article>?, Int) -> Unit) =
+        observe(viewLifecycleOwner) { state ->
+            when(state) {
+                HomeUIState.Loading -> sfl.start()
+                else -> sfl.stop()
             }
-    }
+            when (state) {
+                is HomeUIState.Loading -> setAdapter(null, 10)
+                is HomeUIState.Success -> setAdapter(state.data, state.data.size)
+                else -> setAdapter(null, 0)
+            }
+        }
 
-    private fun setupRvNews(list: List<Article>? = null, count: Int = 0) = binding.rvNews.apply {
-        list?.let { binding.slNews.stop() }
-        adapter = CustomAdapter(ItemNewsBinding::inflate, list?.size ?: count) { b, i ->
-            list?.let {
-                b.article = it[i]
-                b.onItemClickListener(it[i])
+    private fun RecyclerView.setAdapter(
+        inflate: (LayoutInflater, ViewGroup, Boolean) -> ViewBinding,
+        list: List<Article>?, count: Int
+    ) {
+        adapter = CustomAdapter(inflate, list?.size ?: count) { b, i ->
+            if (!list.isNullOrEmpty()) {
+                if (b is ItemHeadlineBinding) b.article = list[i]
+                if (b is ItemNewsBinding) b.article = list[i]
+                b.onItemClickListener(list[i])
             }
         }
     }
