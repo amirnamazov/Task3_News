@@ -15,6 +15,7 @@ import com.example.task3.databinding.FragmentHomeBinding
 import com.example.task3.databinding.ItemHeadlineBinding
 import com.example.task3.databinding.ItemNewsBinding
 import com.example.task3.domain.model.Article
+import com.example.task3.presentation.MainActivity
 import com.example.task3.presentation.base.BaseFragment
 import com.example.task3.presentation.details.DetailsActivity
 import com.example.task3.presentation.utils.CustomAdapter
@@ -66,7 +67,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             when (state) {
                 is HomeUIState.Loading -> setAdapter(null, 10)
                 is HomeUIState.Success -> setAdapter(state.data, state.data.size)
-                else -> setAdapter(null, 0)
+                is HomeUIState.ConnectionError -> {
+                    (requireActivity() as MainActivity).showDialog(state.message)
+                    setAdapter(null, 0)
+                }
+                is HomeUIState.Error -> {
+                    (requireActivity() as MainActivity).showDialog(state.message)
+                    setAdapter(null, 0)
+                }
+                is HomeUIState.Empty -> setAdapter(null, 0)
             }
         }
 

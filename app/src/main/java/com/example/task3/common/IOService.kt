@@ -31,7 +31,7 @@ object IOService {
                 emit(ResourceState.Error(message = response.message()))
             }
         } catch (e: ConnectException) {
-            emit(ResourceState.ConnectionError(message = "Connection Error."))
+            emit(ResourceState.ConnectionError(message = "Network connection problem."))
         } catch (e: Exception) {
             emit(ResourceState.Error(message = e.message ?: "Something went wrong."))
         }

@@ -60,21 +60,21 @@ class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : V
             sharedFlowSearch.debounce(300).collect { fetchNews(it) }
         }
     }
-    
+
     private fun Flow<ResourceState<NewsDTO>>.fetchData(livedata: MutableLiveData<HomeUIState>) =
         viewModelScope.launch(Dispatchers.IO) {
             this@fetchData.collect { res ->
-                    withContext(Dispatchers.Main) {
-                        livedata.value = when (res) {
-                            is ResourceState.ConnectionError -> HomeUIState.ConnectionError
-                            is ResourceState.Error -> HomeUIState.Error(res.message!!)
-                            is ResourceState.Loading -> HomeUIState.Loading
-                            is ResourceState.Success ->
-                                if (res.data?.articles.isNullOrEmpty()) HomeUIState.Empty
-                                else HomeUIState.Success(res.data!!.articles!!.format())
-                        }
+                withContext(Dispatchers.Main) {
+                    livedata.value = when (res) {
+                        is ResourceState.ConnectionError -> HomeUIState.ConnectionError(res.message!!)
+                        is ResourceState.Error -> HomeUIState.Error(res.message!!)
+                        is ResourceState.Loading -> HomeUIState.Loading
+                        is ResourceState.Success ->
+                            if (res.data?.articles.isNullOrEmpty()) HomeUIState.Empty
+                            else HomeUIState.Success(res.data!!.articles!!.format())
                     }
                 }
+            }
         }
 
     private fun List<Article>.format(): List<Article> = map {

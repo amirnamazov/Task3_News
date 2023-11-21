@@ -13,6 +13,7 @@ import com.example.task3.data.data_source.local.model.ArticleModel
 import com.example.task3.databinding.ActivityDetailsBinding
 import com.example.task3.presentation.base.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.runBlocking
 import kotlin.properties.Delegates
 
 @AndroidEntryPoint
@@ -34,7 +35,11 @@ class DetailsActivity : BaseActivity<ActivityDetailsBinding>(ActivityDetailsBind
         setupActionBar()
         initViews()
 
-        saved = articleModel?.id != 0
+        runBlocking {
+            viewModel.checkExistenceInDb(articleModel!!) { saved ->
+                this@DetailsActivity.saved = saved
+            }
+        }
     }
 
     private fun setupActionBar() {
@@ -55,7 +60,7 @@ class DetailsActivity : BaseActivity<ActivityDetailsBinding>(ActivityDetailsBind
             if (!save) setResult(Activity.RESULT_OK)
             else setResult(Activity.RESULT_CANCELED)
             when (state) {
-                is DetailsState.Error -> {}
+                is DetailsState.Error -> binding.root.showSnackBar(state.message)
                 is DetailsState.Success -> { saved = save; onSuccess() }
             }
         }

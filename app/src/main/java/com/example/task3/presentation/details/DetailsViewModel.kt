@@ -10,6 +10,7 @@ import com.example.task3.domain.use_cases.NewsLocalUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -17,16 +18,19 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(private val useCase: NewsLocalUseCase) : ViewModel() {
 
+    suspend fun checkExistenceInDb(model: ArticleModel, saved: (Boolean) -> Unit) = useCase.getAll()
+        .filter { it is ResourceState.Success }
+        .collect { res ->
+            val articles = res.data!!.map { it.article }
+            saved(articles.contains(model.article))
+        }
+
     private val _articleSave = MutableLiveData<DetailsState>()
     val articleSave: LiveData<DetailsState> get() = _articleSave
 
     fun saveArticle(model: ArticleModel) = viewModelScope.launch(Dispatchers.IO) {
-        useCase.getAll().collect { res ->
-            if (res is ResourceState.Success) {
-                val articles = res.data!!.map { it.article }
-                if (!articles.contains(model.article))
-                    useCase.insert(model).getResponse(_articleSave)
-            }
+        checkExistenceInDb(model) { saved ->
+            if (!saved) useCase.insert(model).getResponse(_articleSave)
         }
     }
 

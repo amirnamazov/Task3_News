@@ -6,6 +6,6 @@ sealed interface HomeUIState {
     data object Loading : HomeUIState
     data class Success(val data: List<Article>) : HomeUIState
     data class Error(val message: String) : HomeUIState
-    data object ConnectionError : HomeUIState
+    data class ConnectionError(val message: String) : HomeUIState
     data object Empty : HomeUIState
 }
