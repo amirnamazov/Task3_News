@@ -7,4 +7,8 @@ interface NewsRemoteRepository {
     suspend fun getEverything(map: Map<String, String>): Response<NewsDTO>
 
     suspend fun getHeadlines(map: Map<String, String>): Response<NewsDTO>
+
+    fun getLangValue(): String
+
+    fun setLangValue(value: String)
 }

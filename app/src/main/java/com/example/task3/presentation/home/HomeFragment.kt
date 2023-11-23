@@ -21,19 +21,14 @@ import com.example.task3.presentation.details.DetailsActivity
 import com.example.task3.presentation.utils.CustomAdapter
 import com.facebook.shimmer.ShimmerFrameLayout
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.properties.Delegates
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
 
     private val viewModel: HomeViewModel by viewModels()
 
-    private var searchText by Delegates.observable("") { _, old, new ->
-        if (new != old && new.isNotEmpty()) viewModel.searchNews(new)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.etSearch.doAfterTextChanged { searchText = it.toString() }
+        binding.etSearch.doAfterTextChanged { viewModel.searchText = it.toString() }
         setupLanguageButton()
 
         viewModel.fetchHeadlines()
@@ -68,12 +63,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             when (state) {
                 is HomeUIState.Loading -> setAdapter(null, 10)
                 is HomeUIState.Success -> setAdapter(state.data, state.data.size)
-                is HomeUIState.ConnectionError -> {
-                    (requireActivity() as MainActivity).showDialog(state.message)
-                    setAdapter(null, 0)
-                }
-                is HomeUIState.Error -> {
-                    (requireActivity() as MainActivity).showDialog(state.message)
+                is HomeUIState.Error, is HomeUIState.ConnectionError  -> {
+                    (requireActivity() as MainActivity).showDialog(state.message!!)
                     setAdapter(null, 0)
                 }
                 is HomeUIState.Empty -> setAdapter(null, 0)

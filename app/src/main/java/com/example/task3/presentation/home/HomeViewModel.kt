@@ -1,6 +1,5 @@
 package com.example.task3.presentation.home
 
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,17 +18,15 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val useCase: NewsApiUseCase,
-    private val sharedPref: SharedPreferences
-) : ViewModel() {
+class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : ViewModel() {
 
-    fun getLangValue(): String = sharedPref.getString("LANGUAGE", "en")!!
+    fun getLangValue(): String = useCase.getLangValue()
 
-    fun setLangValue(value: String) = sharedPref.edit().putString("LANGUAGE", value).apply()
+    fun setLangValue(value: String) = useCase.setLangValue(value)
 
     private fun mapHeadLine(): Map<String, String> = mapOf(
         "language" to getLangValue()
@@ -43,8 +40,7 @@ class HomeViewModel @Inject constructor(
     private val _resHeadlines = MutableLiveData<HomeUIState>()
     val resHeadlines: LiveData<HomeUIState> get() = _resHeadlines
 
-    fun fetchHeadlines() =
-        useCase.getHeadlines(mapHeadLine()).fetchData(_resHeadlines)
+    fun fetchHeadlines() = useCase.getHeadlines(mapHeadLine()).fetchData(_resHeadlines)
 
     private val _resNews = MutableLiveData<HomeUIState>()
     val resNews: LiveData<HomeUIState> get() = _resNews
@@ -55,14 +51,14 @@ class HomeViewModel @Inject constructor(
     private val sharedFlowSearch = MutableSharedFlow<String>(
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-
-    fun searchNews(query: String) = sharedFlowSearch.tryEmit(query)
-
-    init {
+    ).apply {
         viewModelScope.launch(Dispatchers.IO) {
-            sharedFlowSearch.debounce(300).collect { fetchNews(it) }
+            debounce(300).collect { fetchNews(it) }
         }
+    }
+
+    var searchText by Delegates.observable("") { _, old, new ->
+        if (new != old && new.isNotEmpty()) sharedFlowSearch.tryEmit(new)
     }
 
     private fun Flow<ResourceState<NewsDTO>>.fetchData(livedata: MutableLiveData<HomeUIState>) =
