@@ -22,18 +22,22 @@ import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val useCase: NewsApiUseCase,
+    private val sharedPref: SharedPreferences
+) : ViewModel() {
 
-    @Inject
-    lateinit var sharedPref: SharedPreferences
+    fun getLangValue(): String = sharedPref.getString("LANGUAGE", "en")!!
+
+    fun setLangValue(value: String) = sharedPref.edit().putString("LANGUAGE", value).apply()
 
     private fun mapHeadLine(): Map<String, String> = mapOf(
-        "language" to sharedPref.getString("LANGUAGE", "en")!!
+        "language" to getLangValue()
     )
 
     private fun mapEveryThing(query: String): Map<String, String> = mapOf(
         "q" to query,
-        "language" to sharedPref.getString("LANGUAGE", "en")!!
+        "language" to getLangValue()
     )
 
     private val _resHeadlines = MutableLiveData<HomeUIState>()

@@ -48,11 +48,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     }
 
     private fun setupLanguageButton() = binding.btnLang.apply {
-        text = viewModel.sharedPref.getString("LANGUAGE", "en")?.uppercase()
-        val dialogLang = BottomSheetDialogLang(requireContext(), viewModel.sharedPref) {
+        text = viewModel.getLangValue().uppercase()
+        val dialogLang = BottomSheetDialogLang(requireContext()) { lang ->
+            viewModel.setLangValue(lang.field)
+            text = lang.name
             viewModel.fetchHeadlines()
             viewModel.fetchNews()
-            text = it
         }
         setOnClickListener { dialogLang.show() }
     }
