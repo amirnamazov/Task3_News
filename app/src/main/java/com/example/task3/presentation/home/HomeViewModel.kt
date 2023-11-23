@@ -28,10 +28,6 @@ class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : V
 
     fun setLangValue(value: String) = useCase.setLangValue(value)
 
-    private fun mapHeadLine(): Map<String, String> = mapOf(
-        "language" to getLangValue()
-    )
-
     private fun mapEveryThing(query: String): Map<String, String> = mapOf(
         "q" to query,
         "language" to getLangValue()
@@ -40,7 +36,7 @@ class HomeViewModel @Inject constructor(private val useCase: NewsApiUseCase) : V
     private val _resHeadlines = MutableLiveData<HomeUIState>()
     val resHeadlines: LiveData<HomeUIState> get() = _resHeadlines
 
-    fun fetchHeadlines() = useCase.getHeadlines(mapHeadLine()).fetchData(_resHeadlines)
+    fun fetchHeadlines() = useCase.getHeadlines().fetchData(_resHeadlines)
 
     private val _resNews = MutableLiveData<HomeUIState>()
     val resNews: LiveData<HomeUIState> get() = _resNews

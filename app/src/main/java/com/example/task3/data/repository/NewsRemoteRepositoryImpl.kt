@@ -12,7 +12,7 @@ class NewsRemoteRepositoryImpl @Inject constructor(
 
     override suspend fun getEverything(map: Map<String, String>) = api.getEverything(map)
 
-    override suspend fun getHeadlines(map: Map<String, String>) = api.getHeadlines(map)
+    override suspend fun getHeadlines() = api.getHeadlines(getLangValue())
 
     override fun getLangValue(): String = sharedPref.getString("LANGUAGE", "en")!!
 

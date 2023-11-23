@@ -6,7 +6,7 @@ import retrofit2.Response
 interface NewsRemoteRepository {
     suspend fun getEverything(map: Map<String, String>): Response<NewsDTO>
 
-    suspend fun getHeadlines(map: Map<String, String>): Response<NewsDTO>
+    suspend fun getHeadlines(): Response<NewsDTO>
 
     fun getLangValue(): String
 

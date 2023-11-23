@@ -8,7 +8,7 @@ class NewsApiUseCase @Inject constructor(private val repository: NewsRemoteRepos
 
     fun getEverything(map: Map<String, String>) = flowResponse { repository.getEverything(map) }
 
-    fun getHeadlines(map: Map<String, String>) = flowResponse { repository.getHeadlines(map) }
+    fun getHeadlines() = flowResponse { repository.getHeadlines() }
 
     fun getLangValue(): String = repository.getLangValue()
 
