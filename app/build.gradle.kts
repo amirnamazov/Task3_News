@@ -74,4 +74,6 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
 
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
 }
